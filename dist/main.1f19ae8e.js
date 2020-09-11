@@ -118,18 +118,56 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 
   return newRequire;
 })({"main.js":[function(require,module,exports) {
-$("#addOne").on("click", function () {
+var book = {
+  name: "JavaScript高级程序设计",
+  number: 2,
+  id: 1
+};
+axios.interceptors.response.use(function (response) {
+  // const config = response.config;
+  // const { method, url, data } = config;
+  var _response$config = response.config,
+      method = _response$config.method,
+      url = _response$config.url,
+      data = _response$config.data;
+
+  if (url === "/books/1" && method === "get") {} else if (url === "/books/1" && method === "put") {
+    Object.assign(book, data);
+  }
+
+  response.data = book;
+  return response;
+});
+axios.get("/books/1").then(function (_ref) {
+  var data = _ref.data;
+  var originalHtml = $("#app").html();
+  var newHtml = originalHtml.replace("__name__", data.name).replace("__number__", data.number);
+  $("#app").html(newHtml);
+});
+$("#app").on("click", "#addOne", function () {
   var oldNumber = $("#number").text();
   var newNumber = oldNumber - 0 + 1;
-  $("#number").text(newNumber);
+  axios.put("/books/1", {
+    number: newNumber
+  }).then(function () {
+    $("#number").text(newNumber);
+  });
 });
-$("#minusOne").on("click", function () {
+$("#app").on("click", "#minusOne", function () {
   var oldNumber = $("#number").text();
   var newNumber = oldNumber - 0 - 1;
-  $("#number").text(newNumber);
+  axios.put("/books/1", {
+    number: newNumber
+  }).then(function () {
+    $("#number").text(newNumber);
+  });
 });
-$("#reset").on("click", function () {
-  $("#number").text(0);
+$("#app").on("click", "#reset", function () {
+  axios.put("/books/1", {
+    number: 0
+  }).then(function () {
+    $("#number").text(0);
+  });
 });
 },{}],"../../../../AppData/Local/Yarn/Data/global/node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
